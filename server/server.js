@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 const HTTP = require('http');
 
 // Call socket.io
-const SOCKET = require ('socket.io');
+const SOCKET = require('socket.io');
 
 // Call express 
 const EXPRESS = require('express');
@@ -23,6 +23,19 @@ app.use(EXPRESS.static(PUBLIC_PATH));
 
 io.on('connection', (socket) => {
     console.log('New User Connected');
+
+    // Upon new connection, greet user.
+    socket.emit('newMessage', {
+        from: 'Admin',
+        text: 'Welcome to the Chat App!',
+        createdAt: new Date().getTime()
+    });
+    // Upon new connection, inform all old connections
+    socket.broadcast.emit('newMessage', {
+        from: 'Admin',
+        text: 'A new user has joined the chat',
+        createdAt: new Date().getTime()
+    });
 
     // Receive new message from a client.
     // Emit that message as a new message to all clients.
