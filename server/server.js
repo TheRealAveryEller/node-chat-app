@@ -1,50 +1,51 @@
+/**
+ * Server Constants
+ */
 // Set Port to listen to. Either var or 3000
 const PORT = process.env.PORT || 3000;
-
 // Call node http
 const HTTP = require('http');
-
 // Call socket.io
 const SOCKET = require('socket.io');
-
 // Call express 
 const EXPRESS = require('express');
-var app = EXPRESS();
 
-// Create a server using express
-// Tell that server to integrate socket.io
+/**
+ * Server Variables
+ */
+// Create app variable that is express
+var app = EXPRESS();
+// Create a server using express app variable
 var server = HTTP.createServer(app);
+// Tell that server to integrate socket.io
 var io = SOCKET(server);
 
-// App set to use PUBLIC_PATH for render
+/**
+ * Server utils
+ */
+// Generate Message
+const {generateMessage} = require('./utils/message');
+
+
+// Set Render Path
 const PATH = require('path');
 const PUBLIC_PATH = PATH.join(__dirname, '../public');
 app.use(EXPRESS.static(PUBLIC_PATH));
+// .Set Render Pathh
 
+// Socket functions on connection
 io.on('connection', (socket) => {
     console.log('New User Connected');
 
-    // Upon new connection, greet user.
-    socket.emit('newMessage', {
-        from: 'Admin',
-        text: 'Welcome to the Chat App!',
-        createdAt: new Date().getTime()
-    });
-    // Upon new connection, inform all old connections
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin',
-        text: 'A new user has joined the chat',
-        createdAt: new Date().getTime()
-    });
+    // Greet new client
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Chat App!'));
+    // Alert current clients to new client
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat'));
 
     // Receive new message from a client.
-    // Emit that message as a new message to all clients.
+    // Emit that message as a newMessage to all clients.
     socket.on('createMessage', (message) => {
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        });
+        io.emit('newMessage', generateMessage(message.from, message.text));
     });
 
     // Client disconnected
@@ -52,6 +53,7 @@ io.on('connection', (socket) => {
         console.log('Client Disconnected');
     });
 });
+// .Socket Functions on connection
 
 // Listen on PORT - return status when running
 server.listen(PORT, () => {
