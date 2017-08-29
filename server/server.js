@@ -24,24 +24,14 @@ app.use(EXPRESS.static(PUBLIC_PATH));
 io.on('connection', (socket) => {
     console.log('New User Connected');
 
-    /**
-     * Event Emitters
-     */
-
-    // Emit message to client
-    socket.emit('newMessage', {
-        from: '',
-        text: '',
-        createdAt: ''
-    });
-
-    /**
-     * Event Handlers
-     */
-
-    // Receive new message from client
-    socket.on('createMessage', (newMessage) => {
-        console.log('createMessage:', newMessage);
+    // Receive new message from a client.
+    // Emit that message as a new message to all clients.
+    socket.on('createMessage', (message) => {
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        });
     });
 
     // Client disconnected
