@@ -26,7 +26,6 @@ var io = SOCKET(server);
 // Generate Message
 const {generateMessage} = require('./utils/message');
 
-
 // Set Render Path
 const PATH = require('path');
 const PUBLIC_PATH = PATH.join(__dirname, '../public');
@@ -36,7 +35,6 @@ app.use(EXPRESS.static(PUBLIC_PATH));
 // Socket functions on connection
 io.on('connection', (socket) => {
     console.log('New User Connected');
-
     // Greet new client
     socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Chat App!'));
     // Alert current clients to new client
@@ -44,8 +42,10 @@ io.on('connection', (socket) => {
 
     // Receive new message from a client.
     // Emit that message as a newMessage to all clients.
-    socket.on('createMessage', (message) => {
+    socket.on('createMessage', (message, callback) => {
+        console.log('createMessage:', message);
         io.emit('newMessage', generateMessage(message.from, message.text));
+        callback('This is from the server.');
     });
 
     // Client disconnected
