@@ -24,13 +24,31 @@ app.use(EXPRESS.static(PUBLIC_PATH));
 io.on('connection', (socket) => {
     console.log('New User Connected');
 
+    /**
+     * Event Emitters
+     */
+
+    // Emit message to client
+    socket.emit('newMessage', {
+        from: '',
+        text: '',
+        createdAt: ''
+    });
+
+    /**
+     * Event Handlers
+     */
+
+    // Receive new message from client
+    socket.on('createMessage', (newMessage) => {
+        console.log('createMessage:', newMessage);
+    });
+
+    // Client disconnected
     socket.on('disconnect', () => {
-        console.log('Client Disconnect');
+        console.log('Client Disconnected');
     });
 });
-
-
-
 
 // Listen on PORT - return status when running
 server.listen(PORT, () => {
