@@ -24,7 +24,7 @@ var io = SOCKET(server);
  * Server utils
  */
 // Generate Message
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 
 // Set Render Path
 const PATH = require('path');
@@ -46,6 +46,12 @@ io.on('connection', (socket) => {
         console.log('createMessage:', message);
         io.emit('newMessage', generateMessage(message.from, message.text));
         callback('This is from the server.');
+    });
+
+    // Recieve coords from a client
+    // Emit those coords as a newMessage to all clients
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 
     // Client disconnected
